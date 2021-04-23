@@ -5,9 +5,6 @@
 ## Setting up Wagtail
 <!--  Pulling down and Setup; Setting the Query Fields (e.g. Search Field, and Filter Field) -->
 
-## API Use
-<!-- How to Activate and use the API -->
-
 ## What we Tested and Restults
 <!--  What Queries we tried (the 4 test cases, and results) -->
 Given that the CYMPH Site will require filtering specific services, we tested how this could be performed in Wagtail. 
