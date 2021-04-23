@@ -65,6 +65,7 @@ Next, we will need to create a model and page that can be used by CMS users to a
         ]
 
     ```
+
 3. Run the appropriate migrations using the following:
     ```console
     python3 manage.py makemigrations
@@ -73,13 +74,21 @@ Next, we will need to create a model and page that can be used by CMS users to a
 4. Verify this has worked by going to the admin panel, and moving to add a page, a service page should now be availble to add, allowing an serviceId, name and supportType to be added.
 
 ### Allowing our fields to be returned via the API
-If we attempt to query the API for our new services, our values will not return, only those that are defaults of page. This is because we will need to explicitly state that they should return. To do this we add the following to our `Service` class:
+If we attempt to query the API for our new services, our values will not return, only those that are defaults of page. This is because we will need to explicitly state that they should return. To do this we add the following to our `Service` class.
 ```python
-    api_fields = [
-        APIField('serviceId'),
-        APIField('name'),
-        APIField('supportType'),
-    ]
+        from wagtail.api import APIField
+        
+        ...
+        
+        class Service(Page):
+
+            ...
+
+            api_fields = [
+                APIField('serviceId'),
+                APIField('name'),
+                APIField('supportType'),
+            ]
 ```
 This will state that any value specified in that array can be returned by the API. **This does not mean that they always will be**.<br />
 To ensure ensure that these are returned we must use the type and fields values within our query: <br />
@@ -90,8 +99,20 @@ In our case `type` will always be `service.Service`, for fields we can inivudall
 
 To test this, the following query `localhost:8000/api/pages/?type=service.Service&fields=*`, should return all service pages with all fields.
 
-## Finally 
+## Allowing for Searching and Filter by Our Types
+Finally, we need to be able to search and filter by our types, to do this we simply need to add to the `search_fields` array, much like we did with the api_fields. Within the `models.py` add the following:
+```python
+    from wagtail.search import index
 
+
+    search_fields = Page.search_fields + [
+        index.SearchField('serviceId'),
+        index.SearchField('name'),
+        index.FilterField('name'),
+        index.SearchField('supportType'),
+        index.FilterField('supportType'),
+```
+This will allow for us to Search (`search=`) on `serviceId`,`name`, and `supportType`, and filter by `name` (`name=`) and `supportType` (`supportType=`).
 ## What we Tested and Results
 <!--  What Queries we tried (the 4 test cases, and results) -->
 Given that the CYMPH Site will require filtering specific services, we tested how this could be performed in Wagtail. 
