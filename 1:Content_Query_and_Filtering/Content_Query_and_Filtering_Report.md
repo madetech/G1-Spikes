@@ -1,9 +1,7 @@
 # Content Query and Filtering
-
-<!-- What the Task was, intro, etc.  -->
+Investigate whether and how Wagtail provides the querying and filtering functionality that will be required to retrieve services and other content types by criteria. More information can be found in [ticket](https://trello.com/c/yOESxJGo/44-wagtail-content-query-filtering-capability).
 
 ## Setting up Wagtail for Spike
-<!--  Pulling down and Setup; Setting the Query Fields (e.g. Search Field, and Filter Field) -->
 ### Prerequisite
 We must first create a wagtail instance and expose the API. To do this we follow these two documents in order:
 1. [Set up a local wagtail instance](./Supporting_Documents/Set_Up_A_Local_Wagtail_Instance.md).
@@ -114,7 +112,6 @@ Finally, we need to be able to search and filter by our types, to do this we sim
 ```
 This will allow for us to Search (`search=`) on `serviceId`,`name`, and `supportType`, and filter by `name` (`name=`) and `supportType` (`supportType=`).
 ## What we Tested and Results
-<!--  What Queries we tried (the 4 test cases, and results) -->
 Given that the CYMPH Site will require filtering specific services, we tested how this could be performed in Wagtail. 
 
 Services could be a list of OR'd services, e.g. Groups of Concerns. Services may also be filtered by specific conditions - for example Support type. 
@@ -164,11 +161,68 @@ Expected test result: Expect all services back
 Result: <span style="color:crimson">FAIL</span>
 
 ## Issues
-<!--  Test case 4 is not working, and multiple AND filters seems to be a pain, seems like multiple ands are not supported out of the BOX  -->
 The way Wagtail appears to oppertate out of the box, is to allow either multiple AND's filtered by a single OR - or - for multiple OR's to be filtered by a single AND. 
 
 We tried a few different ways of getting condition 4 to pass, but were unsucessful. 
 
 ## Suggestions
-<!-- Maybe use graphql, Q langauge, etc. return everything and Serverside Filter in React,  -->
+Since Wagtail is based on Django we could extend some of the search functionality to meet our needs. Possible ways of doing this are listed below:
 
+<!-- wagtail-->
+- ### Use GraphQL.
+    A [GraphQL plugin](https://wagtail.io/blog/getting-started-with-wagtail-and-graphql/) has been found that we could potentially use. Whilst more investigation would be needed, however conceptually this could be a solution.  
+
+
+
+    #### Pros
+    + Established technology.
+    + Seems to be good use case for GraphQL.
+    #### Cons
+    - Requires custom extension.
+    - Will require changes to NextJs backend functionality.
+    - Will require knowledge/investigation of how GraphQL works.
+
+- ### Use Q language to extend current Search functionality
+    As this is Django based, we could creat our own custom search and filter components that make use of Q language. 
+
+    #### Pros
+    + Established technology.
+    + Python based and built-in to Django.
+    #### Cons
+    - Requires investigation into creating custom search/filter functions and classes.
+    - Will require more in-depth Django and data querying expertise.
+    - Will need confirmation if this compliments or replaces Wagtail's search functionallity.
+
+- ### Single large request that we filter.
+    A simple work around where we get all servies and do all filtering and sorting on the Nextjs backend.
+
+    #### Pros
+    + Quickest method.
+
+    #### Cons
+    - Heavier lifting for the backend.
+    - Wagtail now only serves requests, we don't take advantage of the in-built features.
+
+- ### Multiple http requests from the NextJs backend.
+    A simple work around would be to call the API multiple times, once for each filter.
+
+    #### Pros
+    + Quick to set-up.
+    #### Cons
+    - Multiple calls, so we need to consider throttling and network drops.
+    - We need to extend current functionality to allow us to merge and filter results.
+    - The number of calls is directly related to the number of filters selected.
+
+- ### Using a lambda to map between NextJs and Wagtail API.
+    Finally, we could also use a lambda to map between the two methods, this copies the multiple HTTP request method, but prevents any changes to be needed to the NextJs backend. 
+
+    #### Pros
+    + No changes needed to NextJs.
+    + Could be swapped in and out easily.
+    + Provides seperation between NextJs and Wagtail.
+
+    #### Cons
+    - Longest to set-up
+    - Requires infrastructure changes.
+    - Most expensive.
+    - Adds another managed service.
