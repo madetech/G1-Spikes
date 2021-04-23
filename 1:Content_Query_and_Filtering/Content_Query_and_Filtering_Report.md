@@ -117,9 +117,9 @@ This will allow for us to Search (`search=`) on `serviceId`,`name`, and `support
 <!--  What Queries we tried (the 4 test cases, and results) -->
 Given that the CYMPH Site will require filtering specific services, we tested how this could be performed in Wagtail. 
 
-Services could be a list of ORd services, e.g. Groups of Concerns. Services may also be filtered by specific conditions - for example Support type. 
+Services could be a list of OR'd services, e.g. Groups of Concerns. Services may also be filtered by specific conditions - for example Support type. 
 
-Lists of Services need to be ORd and a one to many relationship. Specific conditions need to be used to only return those services that match a specifc use case, e.g Services that have Helpline support. 
+Lists of Services need to be OR'd and a one to many relationship. Specific conditions need to be used to only return those services that match a specifc use case, e.g Services that have Helpline support. 
 
 We tried the following test combinations to see how Wagtail's out of the box search function worked, and what would be returned:
 
