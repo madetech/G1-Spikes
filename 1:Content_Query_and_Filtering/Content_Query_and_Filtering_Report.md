@@ -12,7 +12,7 @@ We must first create a wagtail instance and expose the API. To do this we follow
 ### Creating the service application
 First we will need to create a service application that our content can rely on. To do this, we complete the following from our virtual environment.
 1. Create a new service by running `python3 manage.py startapp service` at the root level, this should create a application directory called `service`.
-2. Add the new application to `INSTALLED_APPS` inside of the main site settings, so for a website called `wagtailspikes`, this would be `wagtailspikes/settings.base.py`, and values are added to the array like to:
+2. Add the new application to `INSTALLED_APPS` inside of the main site settings, so for a website called `wagtailspikes`, this would be `wagtailspikes/settings.base.py`, and values are added to the array:
     ```python
     # Application definition
 
