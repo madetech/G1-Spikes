@@ -242,4 +242,8 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - Data inconsistency could exist if the Lambda fails, leading to different information stored in Wagtail vs. in DynamoDB
 
 ## Preferred Solution
-After discussing with the team we think that Option 6 would be the preferred option. It should be failry straightforward to use a Databae Hook which monitor
+After discussing with the team we think that Option 6 would be the preferred option. It should be fairly straightforward to use a Database Hook which monitors updates to the Wagtail DB, trigger a Lambda, and have the Lambda pull all the services from the Wagtail Database, and insert into a Services DynamoDB.
+
+Since the existing solution already queries DynamoDB for Services, there would be minimal changes to the way the NextJS app currently works/queries. 
+
+Main work would be setting up the Lambda, testing pushes and content changes propagate correctly, and that the data is inserted into Dynamo in the correct format. We could reuse/extend existing scripts for pushing the Services data into DynamoDB also.
