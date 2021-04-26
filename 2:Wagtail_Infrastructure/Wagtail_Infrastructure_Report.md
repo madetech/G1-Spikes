@@ -1,0 +1,1 @@
+# Wagtail Infrastructure Requirements
