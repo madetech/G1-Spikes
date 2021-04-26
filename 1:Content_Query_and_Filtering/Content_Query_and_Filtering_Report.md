@@ -169,7 +169,7 @@ We tried a few different ways of getting condition 4 to pass, but were unsucessf
 Since Wagtail is based on Django we could extend some of the search functionality to meet our needs. Possible ways of doing this are listed below:
 
 <!-- wagtail-->
-- ### Use GraphQL.
+1. ### Use GraphQL.
     A [GraphQL plugin](https://wagtail.io/blog/getting-started-with-wagtail-and-graphql/) has been found that we could potentially use. Whilst more investigation would be needed, however conceptually this could be a solution.  
 
 
@@ -182,7 +182,7 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - Will require changes to NextJs backend functionality.
     - Will require knowledge/investigation of how GraphQL works.
 
-- ### Use Q language to extend current Search functionality
+2. ### Use Q language to extend current Search functionality
     As this is Django based, we could creat our own custom search and filter components that make use of Q language. 
 
     #### Pros
@@ -193,7 +193,7 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - Will require more in-depth Django and data querying expertise.
     - Will need confirmation if this compliments or replaces Wagtail's search functionallity.
 
-- ### Single large request that we filter.
+3. ### Single large request that we filter.
     A simple work around where we get all servies and do all filtering and sorting on the Nextjs backend.
 
     #### Pros
@@ -203,7 +203,7 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - Heavier lifting for the backend.
     - Wagtail now only serves requests, we don't take advantage of the in-built features.
 
-- ### Multiple http requests from the NextJs backend.
+4. ### Multiple http requests from the NextJs backend.
     A simple work around would be to call the API multiple times, once for each filter.
 
     #### Pros
@@ -213,7 +213,7 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - We need to extend current functionality to allow us to merge and filter results.
     - The number of calls is directly related to the number of filters selected.
 
-- ### Using a lambda to map between NextJs and Wagtail API.
+5. ### Using a lambda to map between NextJs and Wagtail API.
     Finally, we could also use a lambda to map between the two methods, this copies the multiple HTTP request method, but prevents any changes to be needed to the NextJs backend. 
 
     #### Pros
@@ -226,3 +226,20 @@ Since Wagtail is based on Django we could extend some of the search functionalit
     - Requires infrastructure changes.
     - Most expensive.
     - Adds another managed service.
+
+6. ### Allowing the NextJs app to use DynamoDB for Services, and use a Lambda to push Wagtail content to DynamoDB
+    A team discussion revealed that we could still make use of DynamoDB. Unfortunatley it does not appear that wagtail has a simple plug-and-play option for Dynamo; however, we can create a Lambda to synch Dynamo with the Wagtail database.
+
+    ### Pros
+    + We get to keep current infrastructure, prevent a tech debt build up.
+    + No need for multiple Wagtail calls per lookup for Services.
+    + Client wouldn't notice any difference regarding where the content is served from, and still be able to maintain Service content in Wagtail.
+    + Removing known unknowns, avoiding extra investigation into how to extend Wagtail to use Q language or GraphQL
+
+    ### Cons
+    - Could be extra expense (DynamoDB, Lambda (although minimal))
+    - More maintenence/infraastrucure 
+    - Data inconsistency could exist if the Lambda fails, leading to different information stored in Wagtail vs. in DynamoDB
+
+## Preferred Solution
+After discussing with the team we think that Option 6 would be the preferred option. It should be failry straightforward to use a Databae Hook which monitor
