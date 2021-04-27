@@ -16,11 +16,25 @@ Get a local instance of Wagtail running and perform the necessary research in or
 
 ## Infrastructure
 
-### Serverless
+Current
+![Current Network Diagram](./Images/network_architecture.svg)
 
 ### Database
+Wagtail natively supports both MySQL and PostgreSQL, so we will require one of these to be able to support our wagtail instance. Wagtail does also provide an "improved" backend for PostgresSQL, providing some methods that MySQL cannot use, due to this we should opt for a PostgresSQL based solution.
 
-### Reliability
+Recently, a discussion has been had that we may need to trigger an AWS lambda when entires are created or updated within Wagtail. This causes a lead towards using an Aurora PostgresSQL-Compatible database. This allow us to trigger lambdas from our database, rather than needing an event system to be implemented. Aurora will boasts higher performance and availability over traditional RDS Postgres instances.
+
+Whilst on the topic of Aurora, we could also consider using serverless Aurora; however, this loses the benefit of being able to use native SQL functions to trigger lambdas.
+
+### Serverless
+As we are able to containerize our wagtail project we can now run it inside of ECS. We have found not evidence that indicates that we cannot use a Fargate task, so it is believed that we can agree to this being a serverless solution.
+Additionally, as we will potentially be using an Aurora RDS instance, we could also opt to use Aurora serverless for our database; however, this cannot trigger lambdas from SQL functions natively and requires an SNS topic to be added, removing an initial use case of moving towards Aurora.
+
+
+### Availability and Reliability
+As Wagtail itself will be hosted as a Fargate task, we spread the task over multiple availability zones to ensure an outage does not effect our service. Additionally, as fargate takes a rolling deployment approach when docker images are updating, there should be no downtime when deploying new versions of our application.
+
+Aurora stores copies of the data in a DB cluster across multiple Availability Zones in a single AWS Region, and synchronously replicates data between these when updated. Additionally, Aurora provides automatic failover, so if an issue occurred within the Primary node, a read replica would become promoted, avoiding database downtime.
 
 ## Terrafrom
 
@@ -89,7 +103,7 @@ The prior is preferred as it means no passwords are passed between our infrastru
 
 ##### Database Username and Password
 
-To enable the later instead, we need to create SSM env values and allow the ECS task to access these. The outputs required can be found within the earlier mentioned RDS module.
+To enable the later instead, we need to create SSM env values (using secure string) and allow the ECS task to access these. The outputs required can be found within the earlier mentioned RDS module.
 
 When creating the ECS task, these will need to be passed into the template file, as we have done with values within cymph_app.
 
@@ -209,6 +223,3 @@ module "ecs_wagtail" {
 }
 
 ```
-
-### The alternative solution to ECS
-Rather than re-using the same cluster, we could also keep the cluster for each application separate.
