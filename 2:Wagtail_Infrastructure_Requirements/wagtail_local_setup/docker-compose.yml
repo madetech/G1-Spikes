@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  web:
+    build: app
+    command: python manage.py runserver 0.0.0.0:8001 --settings=app.settings.dev
+    # volumes:
+    #   - ./app:/usr/src/app/
+    ports:
+      - 8001:8001
+    env_file:
+      - ./local_env_files/.env.dev
+
+    depends_on:
+      - db
+  db:
+    image: postgres:12.2-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./local_env_files/.env.dev.db
+
+volumes:
+    postgres_data:
