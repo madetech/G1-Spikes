@@ -24,16 +24,13 @@ Get a local instance of Wagtail running and perform the necessary research in or
 
 ## Terrafrom
 
-_All terraform code within this section are examples and not necessarily production ready. Many values will be substituted with "stub" style values that will be defined post spike, as we focus on the main sections of infrastructure that is required._
+_All terraform code within this section are examples and not necessarily production ready. Many values will be substituted with "stub" style values that will be defined post spike, as we focus on the main sections of infrastructure that is required. Security Groups and routing will not be considered at this point._
 
 ### The Wagtail Module
 
 The Terraform for Wagtail revolves around two major resources, the Wagtail instance, which we will run via ECS, and the supporting RDS instance. Here we will focus on how to spin those, and their supporting resources up.
 
 #### 1. The RDS Instance
-
-We will start with the RDS instance, as this should contain no dependencies.
-
 The first note is that we do not currently have an RDS module, due to this, it is suggested that we use the [rds-aurora module from AWS](https://registry.terraform.io/modules/terraform-aws-modules/rds-aurora/aws/latest). This module will provide all resources that we need, whilst allowing to be used in a re-usable manner. Additionally, this module makes it swapping between engines and snapshots fairly simple.
 
 Using this module, we can first create an RDS module that is somewhat like this:
@@ -155,7 +152,7 @@ Currently, the module requires 3 input variables, `label_id`, `cluster_config`, 
 
 The next instance of tight coupling is the dependency on the app template_file using `template = file("./templates/cypmh_app.json.tpl")`, instead I would suggest that the template_file is created outside of the module and that the rendered output is passed into the module instead. This will allow our module to be used for any template file, and therefore any task definition we wish in future. In this case we can provide a file for cymph and another for wagtail.
 
-Finally, as the module also creates policies, we run into the risk of tasks having privileges that they do not need breaking the Principle of least Privilege. To resolve this, it is suggested that we keep policies that will be shared by all ecs tasks inside of the module (e.g. assume_role, ecr, and logging policies). Next we create another input variable to provide the arn of externally created policies containing the more specific actions of the task, and attach this to the roles created inside of the module.
+Finally, as the module also creates policies, we run into the risk of tasks having privileges that they do not need breaking the Principle of least Privilege. To resolve this, it is suggested that we keep policies that will be shared by all ecs tasks inside of the module (e.g. assume_role, ecr, and logging policies). Next we create another input variable to provide the arn of an externally created policies containing the more specific actions of the task, and attach this to the roles created inside of the module.
 
 #### Example variables file
 Following this method, the variables file of the updated ecs module may look like this:
@@ -181,6 +178,35 @@ Following this method, the variables file of the updated ecs module may look lik
     variable "task_rendered_template_file {
         description = "The rendered template file to be used by the task definition."
     }
+
+```
+
+#### Example of how this may look inside our project
+
+Here is an example of how declare the ecs tasks may now look inside of our Terraform:
+
+```Terraform
+resource "aws_ecs_cluster" "main" {
+  name = local.cluster_name
+}
+
+module "ecs_cymph" {
+  source                        = "../modules/ecs"
+  label_id                      = local.label_id
+  cluster_config                = local.cluster_config
+  task_config                   = local.task_config
+  additional_policy_arn         = aws_iam_policy.cymph_fargate.arn
+  task_rendered_template_file   = data.template_file.cymph.rendered
+}
+
+module "ecs_wagtail" {
+  source                        = "../modules/ecs"
+  label_id                      = "${local.label_id}-wagtail"
+  cluster_config                = local.cluster_config_wagtail
+  task_config                   = local.task_config_wagtail
+  additional_policy_arn         = aws_iam_policy.wagtail_fargate.arn
+  task_rendered_template_file   = data.template_file.wagtail.rendered
+}
 
 ```
 
