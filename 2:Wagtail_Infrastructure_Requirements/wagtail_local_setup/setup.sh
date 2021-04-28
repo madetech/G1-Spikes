@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
-# TODO maybe make separate scripts so we can choose to just install base wagtail, or the whole Shebang!
+# Run this Script for the intial Setup, you can use docker-compose (or individual scripts) for subsequent usage
+
+#  The scripts will:
+# 1. Setup a Python virtual Environment
+# 2. Install Wagtail to the Virtual Environment
+# 3. Update the default files to use postgress DB instead of the default
+# 4. Update the default files to Expose the API (see: https://docs.wagtail.io/en/stable/advanced_topics/api/v2/configuration.html)
+# 5. Build a Wagtail docker Container
+# 6. Run PostgreSQL Container and the Wagtail Container
+# 7. Create a default Super User (see .env.dev for these values)
 
 
 # Pull and Install Wagtail with Python Virtual Environment
@@ -10,7 +19,7 @@
 ./scripts/update_wagtail_db_envs.sh
 
 # Expose the API
-
+./scripts/expose_wagtail_api.sh
 
 # Launch Docker-Compose
 docker-compose up -d --build
