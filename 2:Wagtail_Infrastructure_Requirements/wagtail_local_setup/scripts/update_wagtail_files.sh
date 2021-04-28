@@ -31,3 +31,6 @@ try:
 except ImportError:
     pass
 " > $WAGTAIL_DEV_FILE
+
+
+echo "psycopg2-binary==2.8.6" >> app/requirements.txt
