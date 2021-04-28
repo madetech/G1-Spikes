@@ -21,6 +21,7 @@ COPY ./app /usr/src/app
 
 RUN pip install -r requirements.txt
 
+EXPOSE 8000
 # Postgres Entrypoint
 COPY scripts/entrypoint.sh /usr/src/app/entrypoint.sh
 ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
