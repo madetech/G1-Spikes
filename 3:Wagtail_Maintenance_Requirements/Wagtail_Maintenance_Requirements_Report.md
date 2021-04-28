@@ -1,0 +1,1 @@
+# Wagtail Maintenance Requirements
