@@ -52,6 +52,8 @@ The default Environment Values are used by Wagtail to connect to the Postgres Da
 |DATABASE|postgres| |
 
 ### .env.db
+For the PostgreSQL container
+
 |Key|Default Value|
 |---|---|
 |POSTGRES_USER|demouser|
