@@ -11,7 +11,7 @@ Get a local instance of Wagtail running and perform the necessary research in or
 
 5) How is the above implemented in Terraform? - Single 
 ## Set up local repository
-
+[Wagtail Local Deployment](./wagtail_local_setup/README.md)
 ## Infrastructure
 
 ### Serverless
