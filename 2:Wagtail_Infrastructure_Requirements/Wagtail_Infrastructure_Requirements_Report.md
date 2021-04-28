@@ -19,7 +19,9 @@
     + [Example of how this may look inside our project](#example-of-how-this-may-look-inside-our-project)
 
 ## Set up local repository
+A local Docker setup which makes use of Wagtail and Postgres is available from this repository for Local Development and Testing, e.g. to get used to Wagtail, testing, and exploring the API. This should only be used for local testing, and is a precursor to an version we can have of the actual Wagtail instance that will be used for proper dev and production. 
 
+See Wagtail_Local_Setup Folder, or view the [README](wagtail_local_setup/README.md)
 ## Infrastructure
 To accommodate Wagtail we will require an RDS instance, and a new Fargate task. We would advise that this task be run on the same cluster, but using a different service and task. As the RDS is only to be used by wagtail instances, we can provision it within the same private subnet as our ECS tasks.
 
