@@ -21,7 +21,7 @@
 ## Set up local repository
 
 ## Infrastructure
-To accommodate Wagtail we will require an RDS instance, and a new Fargate task. We would advise that this task be ran on the same cluster, but using a different service and task. As the RDS is only to be used by wagtail instances, we can provision it within the same private subnet as our ECS tasks.
+To accommodate Wagtail we will require an RDS instance, and a new Fargate task. We would advise that this task be run on the same cluster, but using a different service and task. As the RDS is only to be used by wagtail instances, we can provision it within the same private subnet as our ECS tasks.
 
 This results in our infrastructure now looking like this:
 ![Updated Infrastructure Diagram](./Images/infrastructure_diagram.svg)
@@ -31,17 +31,17 @@ _If you wish to edit the above, please use the associated [XML file](./DrawIO_xm
 ### Database
 Wagtail natively supports both MySQL and PostgreSQL, so we will require one of these to be able to support our wagtail instance. Wagtail does also provide an "improved" backend for PostgresSQL, providing some methods that MySQL cannot use, due to this we should opt for a PostgresSQL based solution.
 
-Recently, a discussion has been had that we may need to trigger an AWS lambda when entires are created or updated within Wagtail. This causes a lead towards using an Aurora PostgresSQL-Compatible database. This allow us to trigger lambdas from our database, rather than needing an event system to be implemented. Aurora will boasts higher performance and availability over traditional RDS Postgres instances.
+Recently, a discussion has been had that we may need to trigger an AWS lambda when entires are created or updated within Wagtail. This causes a lead towards using an Aurora PostgresSQL-Compatible database. This would allow us to trigger lambdas directly from database changes/updates, rather than needing an event system to be implemented. Aurora also boasts higher performance and availability over traditional RDS Postgres instances.
 
 Whilst on the topic of Aurora, we could also consider using serverless Aurora; however, this loses the benefit of being able to use native SQL functions to trigger lambdas.
 
 ### Serverless
-As we are able to containerize our wagtail project we can now run it inside of ECS. We have found not evidence that indicates that we cannot use a Fargate task, so it is believed that we can agree to this being a serverless solution.
+As we are able to containerize our wagtail project we can now run it inside of ECS. We have found no evidence that indicates that we cannot use a Fargate task, so it is believed that we can agree to this being a serverless solution.
 Additionally, as we will potentially be using an Aurora RDS instance, we could also opt to use Aurora serverless for our database; however, this cannot trigger lambdas from SQL functions natively and requires an SNS topic to be added, removing an initial use case of moving towards Aurora.
 
 
 ### Availability and Reliability
-As Wagtail itself will be hosted as a Fargate task, we spread the task over multiple availability zones to ensure an outage does not effect our service. Additionally, as fargate takes a rolling deployment approach when docker images are updating, there should be no downtime when deploying new versions of our application.
+As Wagtail itself will be hosted as a Fargate task, we can spread the task over multiple availability zones to ensure an outage does not effect our service. Additionally, as fargate takes a rolling deployment approach when docker images are updating, there should be no downtime when deploying new versions of our application.
 
 Aurora stores copies of the data in a DB cluster across multiple Availability Zones in a single AWS Region, and synchronously replicates data between these when updated. Additionally, Aurora provides automatic failover, so if an issue occurred within the Primary node, a read replica would become promoted, avoiding database downtime.
 
@@ -99,7 +99,7 @@ Using this module, we can first create an RDS module that is somewhat like this:
     }
 ```
 
-The above does not fully explore the features that we may make use of, but provides a good idea. For more information on the values we can provide, see [this variables file](https://github.com/terraform-aws-modules/terraform-aws-rds-aurora/blob/master/variables.tf).
+The above does not fully explore the features that we may make use of, but provides a good basis. For more information on the values we can provide, see [this variables file](https://github.com/terraform-aws-modules/terraform-aws-rds-aurora/blob/master/variables.tf).
 
 #### 2. Handling our connection
 
@@ -108,13 +108,13 @@ With the database present, we have two options available:
 1. IAM Authentication
 2. Database Username and Password
 
-The prior is preferred as it means no passwords are passed between our infrastructure; however, this relies on a HTTPS connection being present.
+The prior is preferred as it means no passwords are passed between our infrastructure; however, this relies on an HTTPS connection being present.
 
 ##### Database Username and Password
 
-To enable the later instead, we need to create SSM env values (using secure string) and allow the ECS task to access these. The outputs required can be found within the earlier mentioned RDS module.
+To enable the later instead, we need to create SSM env values (using secure strings) and allow the ECS task to access these. The outputs required can be found within the earlier mentioned RDS module.
 
-When creating the ECS task, these will need to be passed into the template file, as we have done with values within cymph_app.
+When creating the ECS task, these will need to be passed into the template file, as we have done with values within the existing cymph_app.
 
 ##### IAM Authentication
 
@@ -131,7 +131,7 @@ GRANT rds_iam TO db_userx;
 
 However, to run this, we will need to look into running a [local-exec](https://www.terraform.io/docs/language/resources/provisioners/local-exec.html) the first time that the instance is created.
 
-Once we have done this, we simply allow access to the created db user on our policies. More information can be found [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.IAMPolicy.html). But for a glance, these statements will look like this:
+Once we have done this, we simply allow access to the created db user on our policies. More information can be found [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.IAMDBAuth.IAMPolicy.html). and the typical statements should look like this:
 
 ```json
 "Statement": [
@@ -155,14 +155,14 @@ The task definition should not change drastically from our current cymph_app.jso
 
 The main work of this decoupling exercise would be to:
 
-1. Allow for dynamic policies to be provided, this will allow us to prevent all ECS tasks from having access to dynamo, and allow wagtail and current cymph tasks to only have access to the resources they need.
+1. Allow for dynamic policies to be provided, this will allow us to prevent all ECS tasks from having access to RDS, Dynamo, etc., allowing Wagtail and current cymph tasks to only have access to the resources they need.
 2. Allowing for different template files to be passed into the module. The module currently only allows the specific template file to be used to define our container_definition.
 3. Potentially provide a separation between clusters and tasks, allowing us to create a cluster with multiple task definitions.
 
-To achieve this, I would first suggest that we do the following:
+To achieve this, we would first suggest doing the following:
 
 #### 1. Create the ECS_Cluster outside of the module
-As the cluster itself it very minimal to set-up, as shown here:
+The cluster itself is very minimal to set-up, as shown here:
 ```terraform
 resource "aws_ecs_cluster" "main" {
   name = local.cluster_name
@@ -170,12 +170,12 @@ resource "aws_ecs_cluster" "main" {
 ```
 It is suggested that we create this at the component level and provide the needed outputs to any modules that require it. This allows us to use multiple tasks and services within the same cluster.
 
-#### 2. Make the ecs module more generic and flexible
-Currently, the module requires 3 input variables, `label_id`, `cluster_config`, and `task_config`, and has the following files. The first change required would be to also allow an input for `aws_cluster_name`, to allow us to pass the now externally created cluster into the module.
+#### 2. Make the ECS module more generic and flexible
+Currently, the module requires three input variables: `label_id`, `cluster_config`, and `task_config`. The first change required would be to also allow an input for `aws_cluster_name`, to allow us to pass the now externally created cluster into the module.
 
-The next instance of tight coupling is the dependency on the app template_file using `template = file("./templates/cypmh_app.json.tpl")`, instead I would suggest that the template_file is created outside of the module and that the rendered output is passed into the module instead. This will allow our module to be used for any template file, and therefore any task definition we wish in future. In this case we can provide a file for cymph and another for wagtail.
+The next instance of tight coupling is the dependency on the app template_file using `template = file("./templates/cypmh_app.json.tpl")`, instead we would suggest that the template_file is created outside of the module and that the rendered output is passed into the module instead. This will allow our module to be used for any template file, and therefore any task definition we wish in future. In this case we can provide a file for cymph and another for wagtail.
 
-Finally, as the module also creates policies, we run into the risk of tasks having privileges that they do not need breaking the Principle of least Privilege. To resolve this, it is suggested that we keep policies that will be shared by all ecs tasks inside of the module (e.g. assume_role, ecr, and logging policies). Next we create another input variable to provide the arn of an externally created policies containing the more specific actions of the task, and attach this to the roles created inside of the module.
+Finally, as the module also creates policies, we run into the risk of tasks having privileges that they do not need breaking the Principle of least Privilege. To resolve this, it is suggested that we keep policies that will be shared by all ECS tasks inside of the module (e.g. assume_role, ECR, and logging policies). Next we create another input variable to provide the arn of an externally created policies containing the more specific actions of the task, and attach this to the roles created inside of the module.
 
 #### Example variables file
 Following this method, the variables file of the updated ecs module may look like this:
@@ -206,7 +206,7 @@ Following this method, the variables file of the updated ecs module may look lik
 
 #### Example of how this may look inside our project
 
-Here is an example of how declare the ecs tasks may now look inside of our Terraform:
+Here is an example of how the ECS tasks may look inside of our Terraform:
 
 ```Terraform
 resource "aws_ecs_cluster" "main" {
