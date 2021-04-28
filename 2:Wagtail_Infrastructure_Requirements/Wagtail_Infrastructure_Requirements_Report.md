@@ -1,11 +1,32 @@
 # Wagtail Infrastructure Requirements
 
+## Table of Contents
+- [Set up local repository](#set-up-local-repository)
+- [Infrastructure](#infrastructure)
+  * [Database](#database)
+  * [Serverless](#serverless)
+  * [Availability and Reliability](#availability-and-reliability)
+- [Terrafrom](#terrafrom)
+  * [The Wagtail Module](#the-wagtail-module)
+    + [1. The RDS Instance](#1-the-rds-instance)
+    + [2. Handling our connection](#2-handling-our-connection)
+      - [Database Username and Password](#database-username-and-password)
+      - [IAM Authentication](#iam-authentication)
+  * [3. The ECS task](#3-the-ecs-task)
+    + [1. Create the ECS_Cluster outside of the module](#1-create-the-ecs-cluster-outside-of-the-module)
+    + [2. Make the ecs module more generic and flexible](#2-make-the-ecs-module-more-generic-and-flexible)
+    + [Example variables file](#example-variables-file)
+    + [Example of how this may look inside our project](#example-of-how-this-may-look-inside-our-project)
+
 ## Set up local repository
 
 ## Infrastructure
+To accommodate Wagtail we will require an RDS instance, and a new Fargate task. We would advise that this task be ran on the same cluster, but using a different service and task. As the RDS is only to be used by wagtail instances, we can provision it within the same private subnet as our ECS tasks.
 
-Current
-![Current Network Diagram](./Images/network_architecture.svg)
+This results in our infrastructure now looking like this:
+![Updated Infrastructure Diagram](./Images/infrastructure_diagram.svg)
+_If you wish to edit the above, please use the associated [XML file](./DrawIO_xml/infrastructure_diagram.xml)._
+
 
 ### Database
 Wagtail natively supports both MySQL and PostgreSQL, so we will require one of these to be able to support our wagtail instance. Wagtail does also provide an "improved" backend for PostgresSQL, providing some methods that MySQL cannot use, due to this we should opt for a PostgresSQL based solution.
