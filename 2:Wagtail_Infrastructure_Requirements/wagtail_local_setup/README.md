@@ -41,7 +41,7 @@ The default Environment Values are used by Wagtail to connect to the Postgres Da
 |DJANGO_SUPERUSER_USERNAME| admin | Username for Wagtail Admin User|
 |DJANGO_SUPERUSER_EMAIL| admin@test.com| Email for Wagtail Admin User|
 |DEBUG| True | Set to False if want to turn Debug mode off |
-|SECRET_KEY|p-3r5as^ls$g42^yoxl56$5h%ct!d!puspdl_p754ca$8ssh6$| Example Key|
+|SECRET_KEY|MY_SUPER_SECRET_KEY| Test Secret Key|
 |DJANGO_ALLOWED_HOSTS|localhost 127.0.0.1 [::1]| |
 |SQL_ENGINE|django.db.backends.postgresql_psycopg2|  |
 |SQL_DATABASE|demo_wagtail| |

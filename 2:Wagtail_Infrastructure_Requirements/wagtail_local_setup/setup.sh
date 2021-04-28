@@ -15,11 +15,9 @@
 # Pull and Install Wagtail with Python Virtual Environment
 ./scripts/get_wagtail.sh
 
-# Update default Wagtail Files to use Local DB - delete and replace existing values
-./scripts/update_wagtail_files.sh
 
-# Expose the API
-./scripts/expose_wagtail_api.sh
+# Expose the API and SetupDB Config
+./scripts/expose_wagtail_api_and_setup_db.sh
 
 # Launch Docker-Compose
 docker-compose up -d --build

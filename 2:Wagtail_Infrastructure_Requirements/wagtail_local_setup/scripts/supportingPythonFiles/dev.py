@@ -1,16 +1,9 @@
-#!/usr/bin/env bash
 
-WAGTAIL_BASE_FILE="app/app/settings/base.py"
-WAGTAIL_DEV_FILE="app/app/settings/dev.py"
-
-sed -i -e "/# Database/,+8d" $WAGTAIL_BASE_FILE
-
-echo "
 from .base import *
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG')
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(\" \")
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS').split(" ")
 
 # Database PostgreSQL
 DATABASES = {
@@ -30,7 +23,4 @@ try:
     from .local import *
 except ImportError:
     pass
-" > $WAGTAIL_DEV_FILE
 
-
-echo "psycopg2-binary==2.8.6" >> app/requirements.txt
