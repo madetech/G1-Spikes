@@ -17,8 +17,7 @@ RUN apk update \
 
 # Install python packages
 RUN pip install --upgrade pip
-# COPY ./requirements.txt /usr/src/app/requirements.txt
-COPY ./app/app /usr/src/app
+COPY ./app /usr/src/app
 
 RUN pip install -r requirements.txt
 

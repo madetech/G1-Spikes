@@ -4,13 +4,12 @@
 
 
 # Pull and Install Wagtail with Python Virtual Environment
-# echo "Starting Virtual Environment..."
-# python3 -m venv venv
-# source venv/env/bin/activate
-# echo "Installing Wagtail..."
-# pip3 install --upgrade pip
-# pip3 install wagtail
-# wagtail start app TODO need to check doesn't already exist
+echo "Starting Virtual Environment..."
+python3 -m venv venv
+source venv/env/bin/activate
+echo "Installing Wagtail..."
+pip3 install --upgrade pip
+pip3 install wagtail
 
 # Update default Wagtail Files to use Local DB - delete and replace existing values
 ./scripts/update_wagtail_db_envs.sh
@@ -19,7 +18,7 @@
 
 
 # Launch Docker-Compose
+docker-compose up --build
 
-
-# Create Admin User
-# docker-compose run --rm web python manage.py createsuperuser
+# Create Admin User (uses .env.dev Superuser values)
+docker-compose run --rm web python manage.py createsuperuser --noinput
