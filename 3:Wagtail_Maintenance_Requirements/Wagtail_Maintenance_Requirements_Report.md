@@ -1,5 +1,30 @@
 # Wagtail Maintenance Requirements
 
+- [Updating and Patching, Release Schedule, and Version Considerations](#updating-and-patching--release-schedule--and-version-considerations)
+  * [Wagtail](#wagtail)
+    + [Applying updates](#applying-updates)
+    + [Release Schedule](#release-schedule)
+    + [Version Suggestion](#version-suggestion)
+    + [Compatibility](#compatibility)
+      - [Considerations so far](#considerations-so-far)
+  * [Django](#django)
+    + [Applying updates](#applying-updates-1)
+    + [Release Schedule](#release-schedule-1)
+    + [Version Suggestion](#version-suggestion-1)
+    + [Compatibility](#compatibility-1)
+      - [Considerations so far](#considerations-so-far-1)
+  * [Python](#python)
+    + [Applying updates](#applying-updates-2)
+    + [Release Schedule](#release-schedule-2)
+    + [Version Suggestion](#version-suggestion-2)
+  * [Docker](#docker)
+    + [Applying updates](#applying-updates-3)
+    + [Version Suggestion](#version-suggestion-3)
+- [Proposed 6 - 12 Month Feature Updates](#proposed-6---12-month-feature-updates)
+- [Automation Suggestions](#automation-suggestions)
+  * [Patches by Recycling Fargate Tasks](#patches-by-recycling-fargate-tasks)
+  * [Dependabot](#dependabot)
+
 This spike focuses on investigate the maintenance requirements of Wagtail, e.g. installation of updates and security patches. 
 
 The following questions will need to be considered:
@@ -11,7 +36,7 @@ The following questions will need to be considered:
 
 To achieve this we will first consider the current versions of Wagtail, Django, Python, and Docker images that are required, and identify them via their current and LTS releases. Finally we can then consider what maintenance is required over the next 6-12 months with consideration to all project layers, and address our automation considerations.
 
-## Updating and Patching, Release Schedule, and Version Considerations,
+## Updating and Patching, Release Schedule, and Version Considerations
 ### Wagtail
 #### Applying updates
 Wagtail provide a clear updating guide which can be found [here](https://docs.wagtail.io/en/stable/releases/upgrading.html).
