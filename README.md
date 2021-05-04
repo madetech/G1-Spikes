@@ -7,10 +7,11 @@
 
  Relates to Spike ticket: https://trello.com/c/dVYnUQj8/96-wagtail-infrastructure-requirements
 
+
 ### 3: [Wagtail Maintenance Requirements](./3:Wagtail_Maintenance_Requirements/Wagtail_Maintenance_Requirements_Report.md)
 
 Relates to Spike ticket: https://trello.com/c/M0lDpxX4/45-wagtail-maintenance-requirements
 
-### 3: [Wagtail Cognito Requirements](./4:Wagtail_Cognito_Requirements/Wagtail_Cognito_Requirements_Report.md)
+### 4: [Wagtail Cognito Requirements](./4:Wagtail_Cognito_Requirements/Wagtail_Cognito_Requirements_Report.md)
 
-Relates to Spike ticket: https://trello.com/c/xN2q0OQd/47-wagtail-cognito-integration
+Relates to Spike ticket: https://trello.com/c/M0lDpxX4/45-wagtail-maintenance-requirements
