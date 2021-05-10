@@ -72,6 +72,7 @@ class Service(Page):
         index.FilterField('name'),
         index.SearchField('maxAge'),
         index.SearchField('minAge'),
+        index.FilterField('serviceTags')
         # index.FilterField('maxAge'),
         # index.FilterField('minAge'),
         # index.RelatedFields('serviceTags', [

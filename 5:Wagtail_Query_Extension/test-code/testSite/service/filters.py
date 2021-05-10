@@ -7,4 +7,7 @@ from taggit.managers import TaggableManager
 class ServiceFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         print(request)
+
+        # Filter tags
+        # Ages > and <
         return queryset
