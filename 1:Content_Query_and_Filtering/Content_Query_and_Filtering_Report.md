@@ -72,7 +72,7 @@ Next, we will need to create a model and page that can be used by CMS users to a
 4. Verify this has worked by going to the admin panel, and moving to add a page, a service page should now be availble to add, allowing an serviceId, name and supportType to be added.
 
 ### Allowing our fields to be returned via the API
-If we attempt to query the API for our new services, our values will not return, only those that are defaults of page. This is because we will need to explicitly state that they should return. To do this we add the following to our `Service` class.
+If we attempt to query the API for our new services, our values will not return, only those that are defaults of page. This is because we will need to explicitly state that they should return. To do this we add the following to our `Service` class (inside `services/models.py`)
 ```python
         from wagtail.api import APIField
         

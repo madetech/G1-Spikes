@@ -50,12 +50,12 @@ If an instance is not already set-up, please follow the [Set Up a Local Wagtail 
     api_router.register_endpoint('images', ImagesAPIViewSet)
     api_router.register_endpoint('documents', DocumentsAPIViewSet)
     ```
-3. Next we need to register the URLs to allow Django to route the requests. This is done by adding the paht and urls to `urls.py`, e.g.
+3. Next we need to register the URLs to allow Django to route the requests. This is done by adding the path and urls to `urls.py`, e.g.
     ```python
     from .api import api_router
 
     urlpatterns = [
-        path('api/v2/', api_router.urls),
+        path('api/', api_router.urls),
         ...
     ]
     ```
