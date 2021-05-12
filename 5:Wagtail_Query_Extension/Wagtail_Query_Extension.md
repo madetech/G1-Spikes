@@ -1,6 +1,6 @@
 # Wagtail Query Extension
 
-This is a further extension on the [first spike](../1:Content_Query_and_Filtering/Content_Query_and_Filtering_Report.md). In this spike we ran into limitations on using querystrings within Wagtail. Since this time we have found a method of creating custom filters to use, so we will re-investigate this further. [ticket](https://trello.com/c/EdGhkte3/140-3-days-timebox-wagtail-query-extension).
+This is a further extension on the [first spike](../1:Content_Query_and_Filtering/Content_Query_and_Filtering_Report.md), in which we ran into limitations on using querystrings within Wagtail. Since then we have found a method of creating custom filters to use, so we will re-investigate this further. [Ticket](https://trello.com/c/EdGhkte3/140-3-days-timebox-wagtail-query-extension).
 
 ## Wagtail Code
 
@@ -10,9 +10,9 @@ The database consists of **only test data**, so is being shared to allow for sim
 
 ### Code Changes Made
 
-In interest of keeping this document focused on testing that we can indeed use Wagtail to meet our querying needs we have provided [this supporting document](./Supporting_Documents/Wagtail_Spike_5_Code_Changes.md) to explain the code changes made to the project after initial set-up.
+In interest of keeping this document focused on testing that we can use Wagtail to meet our querying needs, we have provided [this supporting document](./Supporting_Documents/Wagtail_Spike_5_Code_Changes.md) to explain the code changes made to the project after initial set-up.
 
-In brief however; these changes can be summarised as:
+In brief; these changes can be summarised as:
 
 - Creating SupportTypeTags and ServiceTags as Tag types within our Service model, allowing multiple tags to be applied to a service.
 - Creating minAge and maxAge values within our Service model, allowing for ages to be defined.
@@ -25,7 +25,7 @@ Here we shall define a new test suite to ensure that the Wagtail REST api can pr
 
 ### Test plan
 
-We started from the original test suite found in [the first spike](../1:Content_Query_and_Filtering/Content_Query_and_Filtering_Report.md). It should be noted that since this time, we have moved into using tag groups, allowing for more flexibility, and have considered minimum and maximum ages.
+We started from the original test suite found in the [first spike](../1:Content_Query_and_Filtering/Content_Query_and_Filtering_Report.md). It should be noted that since then, we have moved into using tag groups, allowing for more flexibility, and have considered minimum and maximum ages.
 
 #### Services in the database:
 
@@ -179,6 +179,6 @@ Final querystring: `http://localhost:8000/api/services/?type=service.Service&fie
 
 ## Disabling Free Tags
 
-In this example we used Free tags; however, these can be changed to use fixed tags instead. This will be most likely be required in our production solution, but was not needed for this spike.
+In this example we used Free tags (tags that can be created and edited by the content writer); however, these can be changed to use fixed tags instead. This will be most likely be required in our production solution, but was not needed for this spike.
 
 Information on how to achieve this can be found [here](./Supporting_Documents/Wagtail_Disable_FreeTags.md).

@@ -4,7 +4,10 @@ This document addressed the changes made to the Wagtail files. The pre-requisits
 
 ## Service Model Changes
 
-The first notable change made to the code will be found within our services model (`service/models.py`). Here we make 2 major changes, the introduction of `minAge` and `maxAge`, as well as the introduction of `serviceTags` and `supportTypeTags` using ClusterTaggableManager.
+The first notable change made to the code will be found within our services model (`service/models.py`). 
+Here we make 2 major changes:
+* introduction of `minAge` and `maxAge`, 
+* introduction of `serviceTags` and `supportTypeTags` using ClusterTaggableManager.
 
 ### Adding minAge and maxAge
 
@@ -109,10 +112,10 @@ Now, once migrations have been ran, our services can both, add tags to a service
 
 ### Current Issue
 
-Ideally, the previous section should have sufficed and no further work would be required. Unfortunately, out of the box Wagtail will provide the following issues:
+Ideally, the previous section should have sufficed and no further work would be required. Unfortunately, out of the box Wagtail had the following issues:
 
 - minAge and maxAge will only provide direct comparison operators, so we can check that a value matches, but not that it's less than or greater than a value.
-- Tags require matches to be exclusive, for example, `serviceTag=moodAndMotivation,anxiety` will only returns responses with only both moodAndMotivation and anxiety. We want this be an `OR` check, rather than an `AND` check that we'll require.
+- Tags require matches to be exclusive, for example, `serviceTag=moodAndMotivation,anxiety` will only returns responses with only both moodAndMotivation and anxiety. We want this be an `OR` check, rather than an `AND` check.
 
 Fortunately, we can extend filter functionality to allow for these cases. This will be explained in the following sections.
 
@@ -122,7 +125,7 @@ Fortunately, we can extend filter functionality to allow for these cases. This w
 
 The first step is to create our custom filter, we will call this our `ServiceFilter`. All filters extend the `BaseFilterBackend` and need to implement the method `filter_queryset(self, request, queryset, view)`, which must return the `queryset`.
 
-For this stage, we will create the bare minimum filter. First create `services/filters.py`, and then add the following code:
+For this stage, we will create the bare minimum filter. First create `service/filters.py`, and then add the following code:
 
 ```Python
 ## testSite/service/filters.py
@@ -136,9 +139,9 @@ class ServiceFilter(BaseFilterBackend):
 
 ### Service API Set
 
-To implement our `ServiceFilter` and gain more control over the API, we will need to create our own APIViewSet, we will call this `ServiceAPISet`, and will keep the login inside of `service/api.py`.
+To implement our `ServiceFilter` and gain more control over the API, we will need to create our own APIViewSet, we will call this `ServiceAPISet`, and will keep the logic inside of `service/api.py`.
 
-So far we have been using the `PagesAPIViewSet`, so we will extend this to ensure we keep as much of our current functionality as possible. For the time being we will extend `PagesAPIViewSet`, and only update the `filters_backend` value to include our new ServiceFilter.
+So far we have been using the `PagesAPIViewSet`, so we will extend this to ensure we keep as much of our current functionality as possible. To do this we will extend `PagesAPIViewSet`, and update the `filters_backend` value to include our new `ServiceFilter`.
 
 This is achieved using the following code:
 
@@ -152,7 +155,7 @@ class ServiceAPISet(PagesAPIViewSet):
     filter_backends = [ServiceFilter] + PagesAPIViewSet.filter_backends
 ```
 
-Now, we will need to instruct our main testSite to use our `ServiceAPISet`. To do this, we will update our services endpoint in `testSite/api.py` like so:
+Then we will tell our testSite to use our `ServiceAPISet` instead of `PagesAPISet` by updating our services endpoint in `testSite/api.py` like so:
 
 ```Python
 # testSite/testSite/api.py
@@ -171,13 +174,13 @@ api_router.register_endpoint('services', ServiceAPISet)
 
 ### Information about our planned usage
 
-Now that all calls the the `api/services` route will use our `ServiceAPISet`, we should consider exactly what we wish to achieve.
+Now all calls the the `api/services` route will use our `ServiceAPISet`, we can implement our own logic on how filtering will work.
 
-#### Ages
+#### Ages logic
 
-As QuerySet supports operators such as `lt`,`lte`,`gt`,and `gte`, we would like to use these with fields (such as maxAge) to be able to use ages as we would like. To do this we will want to add suffixes to the values without our querystring. For example `maxAge__lte=15` should return all results where `maxAge <=15`.
+As [django QuerySet](https://docs.djangoproject.com/en/3.2/ref/models/querysets/) supports operators such as `lt`, `lte`, `gt` and `gte`, we would like to use these with fields (such as maxAge) to be able to use ages as we would like. To do this we will want to add suffixes to the values without our querystring. For example `maxAge__lte=15` should return all results where `maxAge <=15`.
 
-#### Tags
+#### Tags logic
 
 We want our tags to operate using `ORs` rather than `ANDs`, e.g. `supportTypeTag=a,b` should return all services with either tags `a` or `b` (or both), not only those including both.
 
