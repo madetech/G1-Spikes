@@ -19,7 +19,6 @@ class SupportTypeTag(TaggedItemBase):
     )
 
 class ServiceTag(TaggedItemBase):
-    free_tagging = False
     content_object = ParentalKey(
         'Service',
         related_name='service_tag',
@@ -52,7 +51,6 @@ class Service(Page):
     description = RichTextField()
     maxAge = models.IntegerField()
     minAge = models.IntegerField()
-    #url = models.URLField()
     serviceTags = ClusterTaggableManager(through=ServiceTag, blank=True, related_name='serviceTags')
     supportTypeTags = ClusterTaggableManager(through=SupportTypeTag, blank=True, related_name='supportTypeTags')
     locationTags = ClusterTaggableManager(through='service.TaggedLocation', blank=True)
@@ -66,11 +64,6 @@ class Service(Page):
         FieldPanel('serviceTags', heading="service tags"),
         FieldPanel('supportTypeTags', heading="support type tags"),
         FieldPanel('locationTags', heading="location tags")
-        # FieldPanel('url'),
-        # MultiFieldPanel([
-        #     FieldPanel('tags'),
-        # ], heading="Relevant Tags"),
-
     ]
     api_fields = [
                 APIField('serviceId'),
@@ -89,19 +82,9 @@ class Service(Page):
         index.SearchField('name'),
         index.SearchField('description'),
         index.FilterField('name'),
-        # index.SearchField('maxAge'),
         index.FilterField('minAge'),
         index.FilterField('serviceTags'),
         index.FilterField('supportTypeTags'),
         index.FilterField('maxAge'),
         index.FilterField('locationTags')
-        # index.FilterField('maxAge'),
-        # index.FilterField('minAge'),
-        # index.RelatedFields('serviceTags', [
-        #         index.SearchField('name', partial_match=True, boost=10),
-        #     ]),
-        # index.RelatedFields('tags', [
-        #     index.SearchField('supportTypeTags', partial_match=True, boost=10),
-        # ]),
-
     ]

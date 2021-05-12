@@ -8,7 +8,7 @@ class ServiceFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
         """
         This performs field level filtering on the result set
-        Eg: ?title=James Joyce
+        Eg: ?supportTag=moodAndMotivation,anxiety
         """
         fields = set(view.get_available_fields(queryset.model, db_fields_only=True))
 
@@ -18,8 +18,8 @@ class ServiceFilter(BaseFilterBackend):
 
         for field_name, value in request.GET.items():
             if "__" in field_name:
-                field_name_split = field_name.split("__")
-                field_name = field_name_split[0]
+                field_name_split = field_name.split("__") #split values around underscore.
+                field_name = field_name_split[0] # set fieldname as should be in database.
                 
             if field_name in fields:
                 try:
@@ -41,16 +41,11 @@ class ServiceFilter(BaseFilterBackend):
                     ))
 
                 if isinstance(field, TaggableManager):
-                    # for tag in value.split(','):
-                    #     queryset = queryset.filter(**{field_name + '__name': tag})
-
-                    # # Stick a message on the queryset to indicate that tag filtering has been performed
-                    # # This will let the do_search method know that it must raise an error as searching
-                    # # and tag filtering at the same time is not supported
-                    # queryset._filtered_by_tag = True
+                    # Here we will split our options and use them within a "In" search to act as an OR case.
                     tags = value.split(',')
                     queryset = queryset.filter(**{field_name+'__name__in': tags}).distinct()
                 elif field_name_split is not None:
+                    # We only enter here if we have received a value such as maxAge__gt, so we will query using that value, and the operator provided in the querystring.
                     queryset = queryset.filter(**{field_name+'__'+field_name_split[1]: value})
                 else:
                     queryset = queryset.filter(**{field_name: value})

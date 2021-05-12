@@ -176,3 +176,9 @@ Expected test result: Expect service 3 to be returned.
 Result: <span style="color:green">PASS</span>
 
 Final querystring: `http://localhost:8000/api/services/?type=service.Service&fields=*&serviceTags=moodAndMotivation,notApplicable&supportTypeTags=counselling,notAvailable&minAge__gte=0&maxAge__lte=50&`
+
+## Non-Free Tags
+
+In this example we used Free tags; however, these can be changed to use fixed tags instead. This will be most likely be required in our production solution, but was not needed for this spike.
+
+Information on how to achieve this can be found [here](./Supporting_Documents/Wagtail_Disable_FreeTags.md)
