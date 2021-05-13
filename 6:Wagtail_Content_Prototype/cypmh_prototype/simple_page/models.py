@@ -8,28 +8,19 @@ from wagtail.search import index
 from wagtail.admin.edit_handlers import FieldPanel, StreamFieldPanel
 from wagtail.images.blocks import ImageChooserBlock
 
+from .blocks import ImageCardBlock, ImageCardSteamField 
 
 class SimplePage(Page):
-  content = RichTextField()
-  steam_field_content = StreamField([
-        ('heading', blocks.CharBlock(form_classname="full title")),
-        ('paragraph', blocks.RichTextBlock()),
-        ('image', ImageChooserBlock()),
-        
+  page_content = StreamField([
+        ('sub_heading', blocks.CharBlock(form_classname="Sub-Heading")),
+        ('paragraph', blocks.CharBlock()),
+        ('image_cards', ImageCardSteamField()),
     ], blank=True)
 
   content_panels = Page.content_panels + [
-        FieldPanel('content'),
-        StreamFieldPanel('steam_field_content')
+      StreamFieldPanel('page_content'),
     ]
 
   api_fields = [
-              APIField('content'),
-              APIField('steam_field_content')
-
-          ]
-
-  # search_fields = Page.search_fields + [
-  #   index.SearchField('url_path'),
-  #   index.FilterField('url_path'),
-  # ]
+    APIField('page_content')
+  ]
