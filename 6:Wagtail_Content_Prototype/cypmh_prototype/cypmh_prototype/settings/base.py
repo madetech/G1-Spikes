@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'home',
     'search',
     'simple_page',
+    'nhs_components',
 
     'wagtail.contrib.forms',
     'wagtail.contrib.redirects',
@@ -51,7 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'wagtail.api.v2',
-    'rest_framework'
+    'rest_framework',
+    'wagtailnhsukfrontend',
 ]
 
 MIDDLEWARE = [
