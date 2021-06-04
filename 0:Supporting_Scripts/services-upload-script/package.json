@@ -1,0 +1,10 @@
+{
+  "name": "dynamo-services-new",
+  "version": "1.0.0",
+  "description": "A small app to import services from TSV to DynamoDB",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "aws-sdk": "^2.916.0"
+  }
+}
