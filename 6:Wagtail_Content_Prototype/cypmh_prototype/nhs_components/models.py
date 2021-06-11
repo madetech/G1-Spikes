@@ -6,7 +6,7 @@ from wagtail.api import APIField
 from wagtail.core import blocks
 
 from wagtailnhsukfrontend.blocks import ActionLinkBlock, WarningCalloutBlock,InsetTextBlock, CareCardBlock, DetailsBlock
-from .blocks import CustomImageBlock, CustomCareCardBlock
+from .blocks import CustomImageBlock, CustomCareCardBlock, CustomCardGroupBlock, CustomCardImageBlock
 class NHSPage(Page):
   body = StreamField([
       # Include any of the blocks you want to use.
@@ -17,7 +17,10 @@ class NHSPage(Page):
       ('care_card', CustomCareCardBlock()),
       ('details', DetailsBlock()),
       ('text_content', blocks.RichTextBlock(features=['h2','h3','bold','italic','ul','ol','link'])),
-      ('image', CustomImageBlock())
+      ('image', CustomImageBlock()),
+      ('card_group', CustomCardGroupBlock() ),
+      ('image_card', CustomCardImageBlock())
+
   ])
 
   content_panels = Page.content_panels + [

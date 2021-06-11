@@ -1,4 +1,4 @@
-from wagtailnhsukfrontend.blocks import ImageBlock, CareCardBlock
+from wagtailnhsukfrontend.blocks import ImageBlock, CareCardBlock, CardGroupBlock, CardImageBlock
 from wagtail.core.blocks import StreamBlock
 from wagtail.images.blocks import ImageChooserBlock
 
@@ -18,14 +18,17 @@ class CustomImageBlock(ImageBlock):
 class CustomCareCardBlock(CareCardBlock):
 
   class CustomBodyStreamBlock(CareCardBlock.BodyStreamBlock):
-  #     richtext = RichTextBlock()
-  #     action_link = ActionLinkBlock()
-  #     details = DetailsBlock()
-  #     inset_text = InsetTextBlock()
       image = CustomImageBlock()
-  #     grey_panel = GreyPanelBlock()
-  #     feature_card = CardFeatureBlock()
-  #     warning_callout = WarningCalloutBlock()
-  #     summary_list = SummaryListBlock()
+
 
   body = CustomBodyStreamBlock(required=True)
+
+class CustomCardImageBlock(CardImageBlock):
+    content_image = CustomImageChooserBlock(label='Image', required=True)
+  
+class CustomCardGroupBlock(CardGroupBlock):
+    class CustomBodyStreamBlock(CardGroupBlock.BodyStreamBlock):
+        card_image = CustomCardImageBlock()
+
+
+    body = CustomBodyStreamBlock(required=True)
