@@ -15,3 +15,7 @@ Relates to Spike ticket: https://trello.com/c/M0lDpxX4/45-wagtail-maintenance-re
 ### 4: [Wagtail Cognito Requirements](./4:Wagtail_Cognito_Requirements/Wagtail_Cognito_Requirements_Report.md)
 
 Relates to Spike ticket: https://trello.com/c/M0lDpxX4/45-wagtail-maintenance-requirements
+
+### 5: [Wagtail Query Extension](./5:Wagtail_Query_Extension/Wagtail_Query_Extension.md)
+
+Relates to Spike ticket: https://trello.com/c/EdGhkte3/140-3-days-timebox-wagtail-query-extension

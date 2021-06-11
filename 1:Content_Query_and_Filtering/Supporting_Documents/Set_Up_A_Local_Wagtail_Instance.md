@@ -9,13 +9,14 @@ Here we mostly abridge the [offical tutorial](https://docs.wagtail.io/en/stable/
     source wagtailspike\env\bin\activate
     ```
 4. Install wagtail within the virtual environment. `pip install wagtail`.
-5. Install dependencies for wagtail:
+5. Create a wagtail app `wagtail start mysite`
+6. Install dependencies for wagtail:
     ```sh
     cd wagtailspike && pip install -r requirements.txt
     ```
-6. Initialise a SQLite database `python3 manage.py migrate`.
-7. Create an admin user for the playground `python3 manage.py createsuperuser`.
-8. Start the server `python3 manage.py runserver`.
+7. Initialise a SQLite database `python3 manage.py migrate`.
+8. Create an admin user for the playground `python3 manage.py createsuperuser`.
+9. Start the server `python3 manage.py runserver`.
 ​
 [localhost:8000](http://localhost:8000) should now serve your wagtail instance, with the admin panel being accessible from [localhost:8000/admin](http://localhost:8000/admin).
 
