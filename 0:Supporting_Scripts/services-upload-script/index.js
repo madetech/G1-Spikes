@@ -12,6 +12,11 @@ const EXPECTED_HEADERS = [
   "Free?",
   "Service type",
   "Risk type",
+  "Support Finder & Text Bot Rank", //10 Number
+  "List of Services Rank", //11 Number
+  "Tent Service?", //12 Boolean (TRUE OR FALSE)
+  "Tent Service Redirect", //13 string
+  "Tent", //14 Number (if empty -> 0)
 ];
 
 function arraysEqual(a, b) {
@@ -46,7 +51,7 @@ function tsvToDynamo(tsvData, tableName) {
     !arraysEqual(headers.slice(0, EXPECTED_HEADERS.length), EXPECTED_HEADERS)
   ) {
     console.log("Headers did not match expected format");
-    console.log(`Provided : ${headers.splice(0, 9)}`);
+    console.log(`Provided : ${headers.splice(0, EXPECTED_HEADERS.length - 1)}`);
     console.log(`Expected : ${EXPECTED_HEADERS}`);
     return;
   }
@@ -54,7 +59,6 @@ function tsvToDynamo(tsvData, tableName) {
   tsvRows.forEach((entry) => {
     putRequests.push({ PutRequest: tsvRowToDynamoItem(entry) });
   });
-
   const chunkedRequests = chunkRequests(tableName, putRequests);
   chunkedRequests.forEach((request) => pushToDynamo(request));
 }
@@ -88,7 +92,8 @@ function tsvRowToDynamoItem(tsvRow) {
   const description = splitData[2].trim();
   minAge = parseInt(splitData[4]);
   maxAge = parseInt(splitData[5]);
-  return {
+
+  const dynamoItem = {
     Item: {
       ServiceId: makeDynamoStringType(serviceId),
       Description: makeDynamoStringType(description),
@@ -103,6 +108,38 @@ function tsvRowToDynamoItem(tsvRow) {
       URL: makeDynamoStringType(url),
     },
   };
+
+  const supportFinderAndTextBotRank = splitData[10].trim();
+  const listOfServiceRanks = splitData[11].trim();
+  const tentService = splitData[12].trim();
+  const tentServiceRedirect = splitData[13].trim();
+  const tent = splitData[14].trim();
+
+  if (supportFinderAndTextBotRank !== "") {
+    dynamoItem.Item.SupportFinderAndTextBotRank = makeDynamoNumberType(
+      parseInt(supportFinderAndTextBotRank).toString()
+    );
+  }
+
+  if (listOfServiceRanks !== "") {
+    dynamoItem.Item.ListOfServicesRank = makeDynamoNumberType(
+      parseInt(listOfServiceRanks).toString()
+    );
+  }
+
+  if (tentService === "TRUE") {
+    dynamoItem.Item.IsTentService = makeDynamoStringType(tentService);
+  }
+
+  if (tentServiceRedirect !== "") {
+    dynamoItem.Item.TentRedirectUrl = makeDynamoStringType(tentServiceRedirect);
+  }
+
+  if (tent !== "") {
+    dynamoItem.Item.Tent = makeDynamoNumberType(parseInt(tent).toString());
+  }
+
+  return dynamoItem;
 }
 
 function chunkRequests(tableName, allRequests) {
@@ -149,6 +186,7 @@ function makeDynamoNumberType(number) {
 function handleTags(tags) {
   const dynamoTags = tags
     .flat()
+    .filter((tag) => tag.trim() !== "")
     .map((tag) =>
       makeDynamoStringType(
         `${tag[0].toLowerCase().trim()}${tag.substring(1).trim()}`
