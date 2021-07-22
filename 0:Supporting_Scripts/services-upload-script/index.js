@@ -1,9 +1,9 @@
-const TSV_FILE = "";
-const DYNAMO_TABLE = "";
+const TSV_FILE = "Service A-Z - Services to include  (4).tsv";
+const DYNAMO_TABLE = "cypmh-staging-service";
 
 const EXPECTED_HEADERS = [
   "Title for website and text service",
-  "Onward link",
+  "Onward link (non-referral)",
   "Description for website and text service",
   "Support type",
   "Min age",
@@ -16,7 +16,9 @@ const EXPECTED_HEADERS = [
   "List of Services Rank", //11 Number
   "Tent Service?", //12 Boolean (TRUE OR FALSE)
   "Tent Service Redirect", //13 string
-  "Tent", //14 Number (if empty -> 0)
+  "Text Bot Referral Description", // String
+  "Text Bot Referral Start word", // String
+  "Text Referral Available?", // String
 ];
 
 function arraysEqual(a, b) {
@@ -51,19 +53,19 @@ function tsvToDynamo(tsvData, tableName) {
     !arraysEqual(headers.slice(0, EXPECTED_HEADERS.length), EXPECTED_HEADERS)
   ) {
     console.log("Headers did not match expected format");
-    console.log(`Provided : ${headers.splice(0, EXPECTED_HEADERS.length - 1)}`);
+    console.log(`Provided : ${headers.splice(0, EXPECTED_HEADERS.length)}`);
     console.log(`Expected : ${EXPECTED_HEADERS}`);
     return;
   }
 
-  tsvRows.forEach((entry) => {
-    putRequests.push({ PutRequest: tsvRowToDynamoItem(entry) });
+  tsvRows.forEach((entry, index) => {
+    putRequests.push({ PutRequest: tsvRowToDynamoItem(entry,index) });
   });
   const chunkedRequests = chunkRequests(tableName, putRequests);
-  chunkedRequests.forEach((request) => pushToDynamo(request));
+  chunkedRequests.forEach(async (request) => await pushToDynamo(request));
 }
 
-function tsvRowToDynamoItem(tsvRow) {
+function tsvRowToDynamoItem(tsvRow,index) {
   const splitData = tsvRow.split("\t");
   const paidTags = splitData[7].split(",").map((tag) => {
     let cleanTag = tag.trim();
@@ -87,7 +89,7 @@ function tsvRowToDynamoItem(tsvRow) {
     splitData[9].split(","),
   ]);
   const name = splitData[0].trim();
-  const serviceId = name.replace(/ /g, "-");
+  const serviceId = `${name.replace(/ /g, "-")}-${index}`;
   const url = splitData[1];
   const description = splitData[2].trim();
   minAge = parseInt(splitData[4]);
@@ -113,7 +115,9 @@ function tsvRowToDynamoItem(tsvRow) {
   const listOfServiceRanks = splitData[11].trim();
   const tentService = splitData[12].trim();
   const tentServiceRedirect = splitData[13].trim();
-  const tent = splitData[14].trim();
+  const textBotReferralDescription = splitData[14].trim();
+  const textBotReferralStartWord = splitData[15].trim();
+  const textReferralAvailable = splitData[16].trim();
 
   if (supportFinderAndTextBotRank !== "") {
     dynamoItem.Item.SupportFinderAndTextBotRank = makeDynamoNumberType(
@@ -134,9 +138,20 @@ function tsvRowToDynamoItem(tsvRow) {
   if (tentServiceRedirect !== "") {
     dynamoItem.Item.TentRedirectUrl = makeDynamoStringType(tentServiceRedirect);
   }
-
-  if (tent !== "") {
-    dynamoItem.Item.Tent = makeDynamoNumberType(parseInt(tent).toString());
+  if (textBotReferralDescription !== "") {
+    dynamoItem.Item.TextBotReferralDescription = makeDynamoStringType(
+      textBotReferralDescription
+    );
+  }
+  if (textBotReferralStartWord !== "") {
+    dynamoItem.Item.TextBotReferralStartWord = makeDynamoStringType(
+      textBotReferralStartWord
+    );
+  }
+  if (textReferralAvailable === "TRUE") {
+    dynamoItem.Item.TextReferralAvailable = makeDynamoStringType(
+      textReferralAvailable
+    );
   }
 
   return dynamoItem;
@@ -156,7 +171,7 @@ function chunkRequests(tableName, allRequests) {
   return chunkedRequests;
 }
 
-function pushToDynamo(dynamoData) {
+async function pushToDynamo(dynamoData) {
   const AWS = require("aws-sdk");
   AWS.config.update({ region: "eu-west-2" });
 
@@ -166,8 +181,9 @@ function pushToDynamo(dynamoData) {
     RequestItems: dynamoData,
   };
 
-  dynamo.batchWriteItem(params, (err, data) => {
+  await dynamo.batchWriteItem(params, (err, data) => {
     if (err) {
+      console.log(params);
       handleError(err);
     } else {
       console.log("Success", data);
